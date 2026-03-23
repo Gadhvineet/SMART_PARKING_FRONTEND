@@ -4,6 +4,7 @@ import Navbar from "./components/navbar"
 import Home from "./pages/home"
 import Login from "./pages/login"
 import Signup from "./pages/signup"
+import UserPage from "./pages/userPage";
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -25,10 +26,14 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/user" element={<UserPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>
   )
 }
+
+
+
 
 export default App
