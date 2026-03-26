@@ -3,107 +3,70 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900">
+    <div className="min-h-screen bg-[#020617] flex flex-col justify-center items-center text-white font-sans selection:bg-sky-500/30 overflow-hidden relative">
+      
+      {/* --- AMBIENT VISUAL LAYER --- */}
+      {/* 1. Main Radial Gradient */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_#075985_0%,_transparent_70%)] opacity-40 pointer-events-none" />
+      
+      {/* 2. Perspective Grid Floor (The "Urban" feel) */}
+      <div 
+        className="absolute bottom-0 w-full h-[50vh] opacity-20 pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+          transform: 'perspective(1000px) rotateX(60deg)',
+          maskImage: 'linear-gradient(to top, black, transparent)'
+        }}
+      />
 
-      {/* ✅ ADDED NAVBAR */}
-      <div className="w-full bg-[#020617] text-white px-6 py-4 flex justify-between items-center">
-        <h1 className="font-bold text-lg">FindPark</h1>
+      {/* 3. Floating Ambient Orbs */}
+      <div className="absolute top-1/4 -left-20 w-72 h-72 bg-sky-600/20 rounded-full blur-[120px] animate-pulse pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-blue-900/20 rounded-full blur-[120px] pointer-events-none" />
 
-        <div className="flex gap-4 items-center">
-          {!user ? (
-            <>
-              <button
-                onClick={() => navigate("/login")}
-                className="bg-[#e0f2fe] text-[#0369a1] px-4 py-2 rounded font-bold text-xs uppercase"
-              >
-                Login
-              </button>
-
-              <button
-                onClick={() => navigate("/signup")}
-                className="bg-[#e0f2fe] text-[#0369a1] px-4 py-2 rounded font-bold text-xs uppercase"
-              >
-                Signup
-              </button>
-            </>
-          ) : (
-            <span className="text-sm">Welcome, {user.name}</span>
-          )}
+      {/* --- CONTENT LAYER --- */}
+      <div className="relative z-10 flex flex-col items-center px-6">
+        {/* LOGO / TITLE */}
+        <div className="mb-4 group">
+           <span className="text-[10px] font-bold tracking-[0.5em] text-sky-400/80 uppercase px-3 py-1 border border-sky-400/20 rounded-full bg-sky-400/5 backdrop-blur-sm">
+            Find Your Safe Spot
+           </span>
         </div>
-      </div>
+        
+        <h1 className="text-7xl md:text-8xl font-black tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-slate-500 drop-shadow-2xl">
+          FindPark
+        </h1>
 
-      {/* 🔹 MAIN CONTENT */}
-      <div className="max-w-6xl mx-auto p-6 md:p-12">
+        {/* DESCRIPTION */}
+        <p className="text-slate-400 mb-12 text-center max-w-sm text-lg leading-relaxed font-light">
+          Experience <span className="text-sky-400 font-normal italic">seamless</span> navigation. 
+          A minimalist gateway to smart, secure, and instant parking solutions.
+        </p>
 
-        {/* HEADER */}
-        <header className="mb-10">
-          <h2 className="text-4xl font-[1000] tracking-tighter">
-            Welcome, {user?.name || "Operator"}
-          </h2>
-          <p className="text-slate-500 text-sm mt-1 uppercase tracking-widest">
-            Smart Parking Dashboard
-          </p>
-        </header>
+        {/* BUTTONS */}
+        <div className="flex flex-col sm:flex-row gap-6 w-full sm:w-auto">
+          <button
+            onClick={() => navigate("/login")}
+            className="group relative bg-[#e0f2fe] text-[#0369a1] px-12 py-4 rounded-2xl font-bold uppercase text-xs tracking-[0.2em] transition-all duration-500 hover:bg-white hover:shadow-[0_0_40px_rgba(186,230,253,0.4)] hover:-translate-y-1 active:scale-95"
+          >
+            Login
+          </button>
 
-        {/* 📊 DASHBOARD STATUS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-            <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2">
-              Active Vehicle
-            </p>
-            <p className="text-3xl font-[1000] text-slate-900">
-              Fortuner
-            </p>
-          </div>
-
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-            <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2">
-              Current Status
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-              <p className="text-lg font-bold text-slate-900">
-                In-Session
-              </p>
-            </div>
-          </div>
-
+          <button
+            onClick={() => navigate("/signup")}
+            className="group relative border border-slate-700/50 bg-slate-900/30 backdrop-blur-xl text-white px-12 py-4 rounded-2xl font-bold uppercase text-xs tracking-[0.2em] transition-all duration-500 hover:bg-slate-800 hover:border-slate-500 hover:-translate-y-1 active:scale-95"
+          >
+            Signup
+          </button>
         </div>
 
-        {/* ⚡ ACTIONS */}
-        <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-100">
-          <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-8">
-            Available Actions
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-            <button className="bg-[#e0f2fe] hover:bg-[#bae6fd] text-[#0369a1] px-6 py-6 rounded-2xl font-[1000] uppercase tracking-[0.2em] text-[10px] transition-all">
-              Find Parking
-            </button>
-
-            <button className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-6 rounded-2xl font-[1000] uppercase tracking-[0.2em] text-[10px] transition-all">
-              Vehicles
-            </button>
-
-            <button className="bg-white border border-slate-200 hover:border-sky-200 text-slate-900 px-6 py-6 rounded-2xl font-[1000] uppercase tracking-[0.2em] text-[10px] transition-all">
-              History
-            </button>
-
-          </div>
+        {/* FOOTER HINT */}
+        <div className="mt-24 flex flex-col items-center gap-2 opacity-30">
+            <div className="w-[1px] h-12 bg-gradient-to-b from-transparent to-slate-500" />
+            <p className="text-[10px] tracking-[0.6em] uppercase font-medium">Est. 2026</p>
         </div>
-
-        {/* FOOTER */}
-        <footer className="mt-16 text-center">
-          <p className="text-[9px] text-slate-300 font-black uppercase tracking-[1em]">
-            Findpark Unified Interface
-          </p>
-        </footer>
-
       </div>
     </div>
   );

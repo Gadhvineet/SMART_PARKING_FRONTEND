@@ -29,13 +29,12 @@ function UserPage() {
                 
                 <div className="space-y-6">
                     <div>
-                       
                         <div>
-  <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Active Vehicle</p>
-  <p className="text-3xl font-[1000] text-slate-900 tracking-tight">
-    {user?.vehicle ? user.vehicle : "No vehicle added"}
-  </p>
-</div>
+                          <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Active Vehicle</p>
+                          <p className="text-3xl font-[1000] text-slate-900 tracking-tight">
+                            {user?.vehicle ? user.vehicle : "No vehicle added"}
+                          </p>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -59,7 +58,11 @@ function UserPage() {
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </button>
 
-            <button className="w-full bg-slate-900 hover:bg-slate-800 text-white px-6 py-6 rounded-2xl font-[1000] uppercase tracking-[0.2em] text-[10px] shadow-sm transition-all transform active:scale-[0.98] text-left flex justify-between items-center group">
+            {/* ✅ UPDATED BUTTON */}
+            <button 
+              onClick={() => window.location.href = "/vehicles"} 
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white px-6 py-6 rounded-2xl font-[1000] uppercase tracking-[0.2em] text-[10px] shadow-sm transition-all transform active:scale-[0.98] text-left flex justify-between items-center group"
+            >
               View Vehicle List
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </button>

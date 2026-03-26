@@ -6,16 +6,17 @@ import Signup from "./pages/signup"
 import UserPage from "./pages/userPage"
 import OwnerPage from "./pages/ownerPage"
 import AdminPage from "./pages/adminPage"
+import VehiclesPage from "./pages/VehiclesPage"
 import Navbar from "./components/Navbar"
 import ProtectedRoute from "./components/protectedRoute"
 
-
 const Layout = ({ children }) => {
   const location = useLocation();
- const hideNavbar =
-  location.pathname === "/" ||
-  location.pathname === "/login" ||
-  location.pathname === "/signup";
+
+  const hideNavbar =
+    location.pathname === "/" ||
+    location.pathname === "/login" ||
+    location.pathname === "/signup";
 
   return (
     <>
@@ -30,42 +31,52 @@ function App() {
     <BrowserRouter>
       <Layout>
         <Routes>
+
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-        <Route 
-  path="/user" 
-  element={
-    <ProtectedRoute>
-      <UserPage />
-    </ProtectedRoute>
-  } 
-/>
 
-<Route 
-  path="/owner" 
-  element={
-    <ProtectedRoute>
-      <OwnerPage />
-    </ProtectedRoute>
-  } 
-/>
+          <Route 
+            path="/user" 
+            element={
+              <ProtectedRoute>
+                <UserPage />
+              </ProtectedRoute>
+            } 
+          />
 
-<Route 
-  path="/admin" 
-  element={
-    <ProtectedRoute>
-      <AdminPage />
-    </ProtectedRoute>
-  } 
-/>
+          <Route 
+            path="/owner" 
+            element={
+              <ProtectedRoute>
+                <OwnerPage />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <AdminPage />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* ✅ ADD THIS HERE */}
+          <Route 
+            path="/vehicles" 
+            element={
+              <ProtectedRoute>
+                <VehiclesPage />
+              </ProtectedRoute>
+            } 
+          />
+
         </Routes>
       </Layout>
     </BrowserRouter>
   )
 }
-
-
-
 
 export default App
