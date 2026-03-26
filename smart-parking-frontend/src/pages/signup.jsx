@@ -27,9 +27,7 @@ function Signup() {
 
     try {
       const { confirmPassword, ...dataToSend } = formData;
-
       await registerUser(dataToSend);
-
       alert("Account Created");
       navigate("/login");
     } catch (error) {
@@ -38,18 +36,32 @@ function Signup() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#020617] p-6 font-sans">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#020617] p-6 font-sans relative overflow-hidden">
       
-      <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl p-10 md:p-12">
+      {/* AMBIENT VISUAL LAYER */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_#075985_0%,_transparent_70%)] opacity-40 pointer-events-none" />
+      <div 
+        className="absolute bottom-0 w-full h-[50vh] opacity-20 pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+          transform: 'perspective(1000px) rotateX(60deg)',
+          maskImage: 'linear-gradient(to top, black, transparent)'
+        }}
+      />
+      <div className="absolute top-1/4 -left-20 w-72 h-72 bg-sky-600/20 rounded-full blur-[120px] animate-pulse pointer-events-none" />
+
+      {/* SIGNUP CARD */}
+      <div className="relative z-10 w-full max-w-md bg-slate-900/40 backdrop-blur-2xl border border-slate-700/50 rounded-[2.5rem] shadow-2xl p-8 md:p-10">
         
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tighter">
+        <div className="mb-6 text-center">
+          <h1 className="text-3xl font-black text-white tracking-tighter">
             Create Account
           </h1>
-          <p className="text-slate-500 text-sm mt-2 font-medium">Join the Findpark network</p>
+          <p className="text-slate-400 text-xs mt-2 font-medium tracking-widest uppercase">Join the Findpark network</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
           
           <input 
             type="text" 
@@ -57,7 +69,7 @@ function Signup() {
             placeholder="Full Name" 
             onChange={handleChange} 
             required 
-            className="w-full bg-slate-100 border-none rounded-2xl px-6 py-4 text-black placeholder:text-slate-400 focus:ring-2 focus:ring-sky-200 outline-none font-bold"
+            className="w-full bg-slate-950/50 border border-slate-700/50 rounded-2xl px-6 py-4 text-white placeholder:text-slate-500 focus:border-sky-500 outline-none font-bold transition-all"
           />
 
           <input 
@@ -66,7 +78,7 @@ function Signup() {
             placeholder="Email" 
             onChange={handleChange} 
             required 
-            className="w-full bg-slate-100 border-none rounded-2xl px-6 py-4 text-black placeholder:text-slate-400 focus:ring-2 focus:ring-sky-200 outline-none font-bold"
+            className="w-full bg-slate-950/50 border border-slate-700/50 rounded-2xl px-6 py-4 text-white placeholder:text-slate-500 focus:border-sky-500 outline-none font-bold transition-all"
           />
 
           <input 
@@ -75,7 +87,7 @@ function Signup() {
             placeholder="Password" 
             onChange={handleChange} 
             required 
-            className="w-full bg-slate-100 border-none rounded-2xl px-6 py-4 text-black placeholder:text-slate-400 focus:ring-2 focus:ring-sky-200 outline-none font-bold"
+            className="w-full bg-slate-950/50 border border-slate-700/50 rounded-2xl px-6 py-4 text-white placeholder:text-slate-500 focus:border-sky-500 outline-none font-bold transition-all"
           />
 
           <input 
@@ -84,35 +96,34 @@ function Signup() {
             placeholder="Confirm Password" 
             onChange={handleChange} 
             required 
-            className="w-full bg-slate-100 border-none rounded-2xl px-6 py-4 text-black placeholder:text-slate-400 focus:ring-2 focus:ring-sky-200 outline-none font-bold"
+            className="w-full bg-slate-950/50 border border-slate-700/50 rounded-2xl px-6 py-4 text-white placeholder:text-slate-500 focus:border-sky-500 outline-none font-bold transition-all"
           />
 
-          <div className="flex flex-col gap-1 px-1">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Account Type</label>
+          <div className="flex flex-col gap-1 px-1 mt-1">
+            <label className="text-[10px] font-black text-sky-400 uppercase tracking-widest">Account Type</label>
             <select 
               name="role" 
               onChange={handleChange}
-              className="w-full bg-slate-100 border-none rounded-2xl px-6 py-4 text-black focus:ring-2 focus:ring-sky-200 outline-none font-bold appearance-none cursor-pointer"
+              className="w-full bg-slate-950/50 border border-slate-700/50 rounded-2xl px-6 py-4 text-white focus:border-sky-500 outline-none font-bold appearance-none cursor-pointer"
             >
-              <option value="user">User</option>
-              <option value="owner">Parking Owner</option>
+              <option value="user" className="bg-slate-900">User</option>
+              <option value="owner" className="bg-slate-900">Parking Owner</option>
             </select>
           </div>
 
           <button 
             type="submit"
-            className="w-full bg-[#e0f2fe] hover:bg-[#bae6fd] text-[#0369a1] font-black py-5 rounded-2xl transition-all transform active:scale-[0.98] mt-4 uppercase tracking-[0.2em] text-xs"
+            className="w-full bg-[#e0f2fe] hover:bg-white text-[#0369a1] font-black py-5 rounded-2xl transition-all transform active:scale-[0.98] mt-4 uppercase tracking-[0.2em] text-xs shadow-lg shadow-sky-500/10"
           >
             Join
           </button>
 
-          {/* ✅ ADDED THIS BLOCK */}
-          <div className="text-center mt-2">
+          <div className="text-center mt-4">
             <p className="text-xs text-slate-500">
               Already have an account?{" "}
               <span
                 onClick={() => navigate("/login")}
-                className="text-[#0369a1] font-bold cursor-pointer hover:underline"
+                className="text-sky-400 font-bold cursor-pointer hover:underline"
               >
                 Login
               </span>
