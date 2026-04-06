@@ -22,18 +22,20 @@ function Login() {
 
     try {
       const res = await loginUser(formData);
-      const user = res.user;
 
-      localStorage.setItem("user", JSON.stringify(res.user));
-      localStorage.setItem("token", res.token);
+      // ✅ FIXED PART
+      const user = res.data.user;
+
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", res.data.token);
 
       if (user.role === "user") navigate("/user");
       else if (user.role === "owner") navigate("/owner");
       else if (user.role === "admin") navigate("/admin");
 
     } catch (error) {
-      console.log(error);
-      alert("Login Failed");
+      console.log("FULL ERROR:", error.response?.data);
+      alert(error.response?.data?.message || "Login Failed");
     }
   };
 
@@ -60,13 +62,17 @@ function Login() {
           <h1 className="text-4xl font-[1000] text-white tracking-tighter mb-2">
             Welcome Back
           </h1>
-          <p className="text-slate-400 text-sm font-medium tracking-widest uppercase">Please enter your credentials</p>
+          <p className="text-slate-400 text-sm font-medium tracking-widest uppercase">
+            Please enter your credentials
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-black text-sky-400 uppercase tracking-widest ml-1">Email</label>
+            <label className="text-[10px] font-black text-sky-400 uppercase tracking-widest ml-1">
+              Email
+            </label>
             <input 
               type="email" 
               name="email" 
@@ -78,7 +84,9 @@ function Login() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-black text-sky-400 uppercase tracking-widest ml-1">Password</label>
+            <label className="text-[10px] font-black text-sky-400 uppercase tracking-widest ml-1">
+              Password
+            </label>
             <input 
               type="password" 
               name="password" 

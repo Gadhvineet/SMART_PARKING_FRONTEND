@@ -6,7 +6,7 @@ function UserPage() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.href = "/login";
+    window.location.href = "/login";                                    
   };
 
   return (
@@ -53,12 +53,16 @@ function UserPage() {
           {/* ⚡ AVAILABLE ACTIONS */}
           <div className="md:col-span-5 flex flex-col gap-4">
             
-            <button className="w-full bg-[#e0f2fe] hover:bg-[#bae6fd] text-[#0369a1] px-6 py-6 rounded-2xl font-[1000] uppercase tracking-[0.2em] text-[10px] shadow-sm transition-all transform active:scale-[0.98] text-left flex justify-between items-center group">
+            {/* ✅ UPDATED BUTTON (ONLY CHANGE) */}
+            <button
+              onClick={() => window.location.href = "/find-parking"}
+              className="w-full bg-[#e0f2fe] hover:bg-[#bae6fd] text-[#0369a1] px-6 py-6 rounded-2xl font-[1000] uppercase tracking-[0.2em] text-[10px] shadow-sm transition-all transform active:scale-[0.98] text-left flex justify-between items-center group"
+            >
               Find New Parking
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </button>
 
-            {/* ✅ UPDATED BUTTON */}
+            {/* ✅ VEHICLE PAGE BUTTON */}
             <button 
               onClick={() => window.location.href = "/vehicles"} 
               className="w-full bg-slate-900 hover:bg-slate-800 text-white px-6 py-6 rounded-2xl font-[1000] uppercase tracking-[0.2em] text-[10px] shadow-sm transition-all transform active:scale-[0.98] text-left flex justify-between items-center group"
