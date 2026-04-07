@@ -7,7 +7,7 @@ function VehiclesPage() {
 
   const [form, setForm] = useState({
     vehicleName: "",
-    vehicleType: "car",
+    vehicleType: "2-wheeler",
     vehicleNumber: "",
     colour: "",
     image: null,
@@ -103,12 +103,16 @@ function VehiclesPage() {
 
   // 🔹 HANDLE INPUT
   const handleChange = (e) => {
-    if (e.target.name === "image") {
-      setForm({ ...form, image: e.target.files[0] });
-    } else {
-      setForm({ ...form, [e.target.name]: e.target.value });
-    }
-  };
+  const { name, value, files } = e.target;
+
+  if (name === "image") {
+    setForm({ ...form, image: files[0] });
+  } else if (name === "vehicleNumber") {
+    setForm({ ...form, vehicleNumber: value.toUpperCase() });
+  } else {
+    setForm({ ...form, [name]: value });
+  }
+};
 
   // 🔹 ADD / UPDATE VEHICLE
   const handleSubmit = async (e) => {
@@ -155,7 +159,7 @@ function VehiclesPage() {
 
       setForm({
         vehicleName: "",
-        vehicleType: "car",
+        vehicleType: "2-wheeler",
         vehicleNumber: "",
         colour: "",
         image: null,
@@ -201,7 +205,7 @@ function VehiclesPage() {
 
     setForm({
       vehicleName: "",
-      vehicleType: "car",
+      vehicleType: "2-wheeler",
       vehicleNumber: "",
       colour: "",
       image: null,
@@ -241,10 +245,10 @@ function VehiclesPage() {
             onChange={handleChange}
             style={inputStyle}
           >
-            <option value="car">Car</option>
-            <option value="bike">Bike</option>
-            <option value="bus">Bus</option>
-            <option value="truck">Truck</option>
+            <option value="2-wheeler">2 Wheeler</option>
+            <option value="3-wheeler">3 Wheeler</option>
+            <option value="4-wheeler">4 Wheeler</option>
+            <option value="heavy-vehicle">Heavy Vehicle</option>
           </select>
 
           <input

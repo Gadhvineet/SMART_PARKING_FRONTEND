@@ -23,7 +23,7 @@ function Login() {
     try {
       const res = await loginUser(formData);
 
-      // ✅ FIXED PART
+      // role based redirect
       const user = res.data.user;
 
       localStorage.setItem("user", JSON.stringify(res.data.user));
@@ -44,15 +44,17 @@ function Login() {
       
       {/* AMBIENT VISUAL LAYER */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_#075985_0%,_transparent_70%)] opacity-40 pointer-events-none" />
+      
       <div 
         className="absolute bottom-0 w-full h-[50vh] opacity-20 pointer-events-none"
         style={{
           backgroundImage: `linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px)`,
-          backgroundSize: '60px 60px',
-          transform: 'perspective(1000px) rotateX(60deg)',
-          maskImage: 'linear-gradient(to top, black, transparent)'
+          backgroundSize: "60px 60px",
+          transform: "perspective(1000px) rotateX(60deg)",
+          maskImage: "linear-gradient(to top, black, transparent)"
         }}
       />
+
       <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-blue-900/20 rounded-full blur-[120px] pointer-events-none" />
 
       {/* LOGIN CARD */}
@@ -74,10 +76,10 @@ function Login() {
               Email
             </label>
             <input 
-              type="email" 
-              name="email" 
-              placeholder="name@email.com" 
-              onChange={handleChange} 
+              type="email"
+              name="email"
+              placeholder="name@email.com"
+              onChange={handleChange}
               required
               className="w-full bg-slate-950/50 border border-slate-700/50 rounded-2xl px-6 py-4.5 text-white placeholder:text-slate-600 focus:border-sky-500 outline-none transition-all font-bold"
             />
@@ -88,10 +90,10 @@ function Login() {
               Password
             </label>
             <input 
-              type="password" 
-              name="password" 
-              placeholder="••••••••" 
-              onChange={handleChange} 
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              onChange={handleChange}
               required
               className="w-full bg-slate-950/50 border border-slate-700/50 rounded-2xl px-6 py-4.5 text-white placeholder:text-slate-600 focus:border-sky-500 outline-none transition-all font-bold"
             />
@@ -122,6 +124,7 @@ function Login() {
             Findpark Secure
           </p>
         </div>
+
       </div>
     </div>
   );
