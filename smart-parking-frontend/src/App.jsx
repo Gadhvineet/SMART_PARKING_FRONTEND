@@ -12,7 +12,11 @@ import AdminPage from "./pages/adminPage";
 import VehiclesPage from "./pages/VehiclesPage";
 import ParkingLotsPage from "./pages/ParkingLotsPage";
 import AddParkingPage from "./pages/AddParkingPage";
-import FindParkingPage from "./pages/FindParkingPage";
+import FindParkingPage from "./pages/findParkingPage";
+import ProfilePage from "./pages/profilePage";
+
+/* OWNER SLOT PAGE */
+import OwnerSlotsPage from "./pages/OwnerSlotsPage";
 
 /* ADMIN PAGES */
 import AdminUsersPage from "./pages/adminUsersPage";
@@ -61,6 +65,16 @@ function App() {
             }
           />
 
+          {/* USER PROFILE */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute allowedRoles={["user"]}>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* OWNER DASHBOARD */}
           <Route
             path="/owner"
@@ -73,7 +87,6 @@ function App() {
 
           {/* ================= ADMIN ROUTES ================= */}
 
-          {/* ADMIN DASHBOARD */}
           <Route
             path="/admin"
             element={
@@ -83,7 +96,6 @@ function App() {
             }
           />
 
-          {/* ADMIN USERS */}
           <Route
             path="/admin/users"
             element={
@@ -93,7 +105,6 @@ function App() {
             }
           />
 
-          {/* ADMIN OWNERS */}
           <Route
             path="/admin/owners"
             element={
@@ -103,7 +114,6 @@ function App() {
             }
           />
 
-          {/* ADMIN PARKING LOTS */}
           <Route
             path="/admin/parkinglots"
             element={
@@ -113,7 +123,6 @@ function App() {
             }
           />
 
-          {/* ADMIN SLOTS */}
           <Route
             path="/admin/slots"
             element={
@@ -123,7 +132,6 @@ function App() {
             }
           />
 
-          {/* ADMIN BOOKINGS */}
           <Route
             path="/admin/bookings"
             element={
@@ -135,7 +143,6 @@ function App() {
 
           {/* ================= USER FEATURES ================= */}
 
-          {/* VEHICLES PAGE */}
           <Route
             path="/vehicles"
             element={
@@ -145,7 +152,6 @@ function App() {
             }
           />
 
-          {/* USER FIND PARKING */}
           <Route
             path="/find-parking"
             element={
@@ -157,7 +163,6 @@ function App() {
 
           {/* ================= OWNER FEATURES ================= */}
 
-          {/* OWNER ADD PARKING */}
           <Route
             path="/owner/add-parking"
             element={
@@ -167,12 +172,20 @@ function App() {
             }
           />
 
-          {/* OWNER MANAGE PARKING LOTS */}
           <Route
             path="/owner/parkinglots"
             element={
               <ProtectedRoute allowedRoles={["owner"]}>
                 <ParkingLotsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/owner/slots/:parkingLotId"
+            element={
+              <ProtectedRoute allowedRoles={["owner"]}>
+                <OwnerSlotsPage />
               </ProtectedRoute>
             }
           />

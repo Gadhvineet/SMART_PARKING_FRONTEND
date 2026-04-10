@@ -29,9 +29,30 @@ function AdminSlotsPage() {
         Parking Slots
       </h1>
 
-      <div className="bg-white rounded-xl shadow p-6">
+      <div className="grid grid-cols-4 gap-4">
 
-        <p>Total Slots: {slots.length}</p>
+        {slots.map(slot => (
+
+          <div
+            key={slot._id}
+            className="p-4 bg-white rounded shadow text-center"
+          >
+
+            <h3 className="text-xl font-bold">
+              {slot.slotNumber}
+            </h3>
+
+            <p className="text-sm text-gray-500">
+              {slot.parkingLot?.name}
+            </p>
+
+            <p className="text-xs">
+              {slot.status}
+            </p>
+
+          </div>
+
+        ))}
 
       </div>
 

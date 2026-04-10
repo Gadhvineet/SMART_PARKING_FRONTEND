@@ -18,7 +18,7 @@ function VehiclesPage() {
   const token = localStorage.getItem("token");
   const SERVER_URL = "http://localhost:5000";
 
-  // 🔹 FETCH VEHICLES
+  // FETCH VEHICLES
   const fetchVehicles = async () => {
     try {
       const res = await axios.get("http://localhost:5000/vehicles/get", {
@@ -34,6 +34,7 @@ function VehiclesPage() {
 
   useEffect(() => {
     fetchVehicles();
+    window.scrollTo({top:400,behavior:"smooth"});
   }, []);
 
   useEffect(() => {
@@ -63,58 +64,25 @@ function VehiclesPage() {
         : `${SERVER_URL}/${image.replace(/^\/+/, "")}`;
     }
 
-    if (typeof image === "object") {
-      const fields = [
-        "url",
-        "secure_url",
-        "location",
-        "imageUrl",
-        "imageURL",
-        "image_url",
-        "imagePath",
-        "image_path",
-        "path",
-        "filename",
-      ];
-
-      for (const field of fields) {
-        const value = image[field];
-        if (value) {
-          return buildImageUrl(value);
-        }
-      }
-
-      if (image.image) {
-        return buildImageUrl(image.image);
-      }
-
-      if (image.data && image.contentType) {
-        const rawData = image.data.data || image.data;
-        const bytes = rawData instanceof Uint8Array ? rawData : new Uint8Array(rawData);
-        const binary = Array.from(bytes)
-          .map((byte) => String.fromCharCode(byte))
-          .join("");
-        return `data:${image.contentType};base64,${btoa(binary)}`;
-      }
-    }
-
     return null;
   };
 
-  // 🔹 HANDLE INPUT
+  // HANDLE INPUT
   const handleChange = (e) => {
-  const { name, value, files } = e.target;
+    const { name, value, files } = e.target;
 
-  if (name === "image") {
-    setForm({ ...form, image: files[0] });
-  } else if (name === "vehicleNumber") {
-    setForm({ ...form, vehicleNumber: value.toUpperCase() });
-  } else {
-    setForm({ ...form, [name]: value });
-  }
-};
+    if (name === "image") {
+      setForm({ ...form, image: files[0] });
+    } 
+    else if (name === "vehicleNumber") {
+      setForm({ ...form, vehicleNumber: value.toUpperCase() });
+    } 
+    else {
+      setForm({ ...form, [name]: value });
+    }
+  };
 
-  // 🔹 ADD / UPDATE VEHICLE
+  // ADD / UPDATE VEHICLE
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -168,12 +136,19 @@ function VehiclesPage() {
       fetchVehicles();
 
     } catch (err) {
+
       console.error("Save vehicle error:", err);
-      alert("Error saving vehicle");
+
+      if (err.response && err.response.data) {
+        alert(err.response.data.message || "Vehicle save failed");
+      } else {
+        alert("Server error while saving vehicle");
+      }
+
     }
   };
 
-  // 🔹 DELETE
+  // DELETE
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/vehicles/delete/${id}`, {
@@ -186,7 +161,7 @@ function VehiclesPage() {
     }
   };
 
-  // 🔹 EDIT
+  // EDIT
   const handleEdit = (v) => {
     setForm({
       vehicleName: v.vehicleName,
@@ -199,7 +174,7 @@ function VehiclesPage() {
     setEditId(v._id);
   };
 
-  // 🔹 CANCEL EDIT
+  // CANCEL EDIT
   const cancelEdit = () => {
     setEditId(null);
 
@@ -216,7 +191,7 @@ function VehiclesPage() {
     <div style={{ padding: "20px" }}>
       <h1 style={{ textAlign: "center" }}>🚗 My Vehicles</h1>
 
-      {/* 🔥 FORM CARD */}
+      {/* FORM CARD */}
       <div style={{
         maxWidth: "500px",
         margin: "20px auto",
@@ -296,7 +271,7 @@ function VehiclesPage() {
         </form>
       </div>
 
-      {/* 🔥 VEHICLE LIST */}
+      {/* VEHICLE LIST */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
@@ -345,7 +320,7 @@ function VehiclesPage() {
   );
 }
 
-/* 🔹 STYLES */
+/* STYLES */
 
 const inputStyle = {
   width: "100%",

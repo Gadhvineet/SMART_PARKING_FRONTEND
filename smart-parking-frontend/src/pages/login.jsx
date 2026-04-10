@@ -24,16 +24,18 @@ function Login() {
       const res = await loginUser(formData);
 
       // role based redirect
-      const user = res.data.user;
+      const user = res.user;
 
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.user));
+      localStorage.setItem("token", res.token);
 
       if (user.role === "user") navigate("/user");
       else if (user.role === "owner") navigate("/owner");
       else if (user.role === "admin") navigate("/admin");
 
     } catch (error) {
+      console.log(error);
+      
       console.log("FULL ERROR:", error.response?.data);
       alert(error.response?.data?.message || "Login Failed");
     }

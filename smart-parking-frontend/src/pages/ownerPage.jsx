@@ -112,7 +112,7 @@ function OwnerPage() {
 
         <div className="bg-white p-8 md:p-12 rounded-[3rem] border">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
             {/* ADD PARKING LOT */}
 
@@ -133,16 +133,6 @@ function OwnerPage() {
             >
               <span className="text-2xl block mb-2">📍</span>
               Manage Parking Lots
-            </button>
-
-
-            {/* MANAGE SLOTS */}
-
-            <button
-              className="bg-slate-50 hover:bg-slate-100 text-slate-900 px-6 py-10 rounded-3xl border"
-            >
-              <span className="text-2xl block mb-2">🚗</span>
-              Manage Slots
             </button>
 
 

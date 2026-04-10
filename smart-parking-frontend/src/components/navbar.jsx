@@ -1,24 +1,46 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 function Navbar() {
-  const user = JSON.parse(localStorage.getItem("user"));
+
+  const [user,setUser] = useState(null);
+
+  useEffect(()=>{
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    setUser(storedUser);
+  },[]);
 
   const handleLogout = () => {
+
     const confirmLogout = window.confirm("Are you sure you want to logout?");
 
-    if (confirmLogout) {
+    if(confirmLogout){
+
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+
+      window.location.href="/login";
     }
   };
 
   return (
+
     <div className="w-full bg-[#020617] text-white px-6 py-4 flex justify-between items-center">
-      <h1 className="font-bold text-lg">FindPark</h1>
+
+      <h1
+        className="font-bold text-lg cursor-pointer"
+        onClick={()=>window.location.href="/user"}
+      >
+        FindPark
+      </h1>
 
       <div className="flex gap-6 items-center">
-        <span>{user?.name}</span>
+
+        <span
+          className="cursor-pointer"
+          onClick={()=>window.location.href="/profile"}
+        >
+          {user?.name}
+        </span>
 
         <button
           onClick={handleLogout}
@@ -26,9 +48,13 @@ function Navbar() {
         >
           Logout
         </button>
+
       </div>
+
     </div>
+
   );
+
 }
 
 export default Navbar;
