@@ -4,7 +4,8 @@ import {
   getUserReservations,
   cancelReservation,
   extendReservation,
-  getUserProfile
+  getUserProfile,
+  addReview
 } from "../services/userServices";
 
 function UserPage() {
@@ -15,6 +16,11 @@ function UserPage() {
   const [historyReservations, setHistoryReservations] = useState([]);
 
   const [user, setUser] = useState(null);
+
+  // REVIEW STATES (ADDED)
+  const [reviewReservation, setReviewReservation] = useState(null);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
 
   const SERVER_URL = "http://localhost:5000";
 
@@ -171,6 +177,47 @@ function UserPage() {
 
       console.log(error);
       alert("Error extending parking");
+
+    }
+
+  };
+
+
+  // ===============================
+  // SUBMIT REVIEW (ADDED)
+  // ===============================
+  const submitReview = async () => {
+
+    try {
+
+      // Get the reservation object to extract parkingLot
+      const reservation = historyReservations.find(r => r._id === reviewReservation);
+      
+      if (!reservation || !reservation.parkingLot) {
+        alert("Error: Could not find parking lot information");
+        return;
+      }
+
+      await addReview({
+        reservation: reviewReservation,
+        parkingLot: reservation.parkingLot,
+        rating: parseInt(rating),
+        comment
+      });
+
+      alert("Review submitted successfully");
+
+      setReviewReservation(null);
+      setComment("");
+      setRating(5);
+      
+      // Refresh bookings
+      fetchBookings();
+
+    } catch (error) {
+
+      console.log(error);
+      alert("Error submitting review: " + (error.response?.data?.message || error.message));
 
     }
 
@@ -453,9 +500,58 @@ function UserPage() {
                 {new Date(r.timePeriod.endTime).toLocaleString()}
               </p>
 
+              {/* ADD REVIEW BUTTON */}
+              <button
+                onClick={() => setReviewReservation(r._id)}
+                className="mt-3 bg-slate-900 text-white px-4 py-2 rounded text-sm"
+              >
+                Add Review
+              </button>
+
             </div>
 
           ))}
+
+          {/* REVIEW FORM */}
+
+          {reviewReservation && (
+
+            <div className="bg-white p-5 mt-6 rounded-xl border">
+
+              <h3 className="font-bold mb-3">
+                Add Review
+              </h3>
+
+              <select
+                value={rating}
+                onChange={(e)=>setRating(e.target.value)}
+                className="border p-2 mr-3"
+              >
+                <option value="5">⭐⭐⭐⭐⭐</option>
+                <option value="4">⭐⭐⭐⭐</option>
+                <option value="3">⭐⭐⭐</option>
+                <option value="2">⭐⭐</option>
+                <option value="1">⭐</option>
+              </select>
+
+              <input
+                type="text"
+                placeholder="Write your comment"
+                value={comment}
+                onChange={(e)=>setComment(e.target.value)}
+                className="border p-2 mr-3"
+              />
+
+              <button
+                onClick={submitReview}
+                className="bg-green-600 text-white px-4 py-2 rounded"
+              >
+                Submit Review
+              </button>
+
+            </div>
+
+          )}
 
         </div>
 

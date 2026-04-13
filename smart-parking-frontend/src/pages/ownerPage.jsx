@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { getActiveBookings } from "../services/ownerServices";
 
 function OwnerPage() {
 
@@ -9,6 +10,7 @@ function OwnerPage() {
 
   const [totalLots, setTotalLots] = useState(0);
   const [totalSlots, setTotalSlots] = useState(0);
+  const [activeBookings, setActiveBookings] = useState(0); // NEW STATE
 
   const SERVER_URL = "http://localhost:5000";
 
@@ -41,8 +43,27 @@ function OwnerPage() {
     }
   };
 
+
+  // FETCH ACTIVE BOOKINGS
+  const fetchActiveBookings = async () => {
+
+    try {
+
+      const count = await getActiveBookings();
+      setActiveBookings(count);
+
+    } catch (error) {
+
+      console.error("Error fetching active bookings:", error);
+
+    }
+
+  };
+
+
   useEffect(() => {
     fetchParkingLots();
+    fetchActiveBookings(); // NEW
   }, []);
 
   return (
@@ -100,7 +121,7 @@ function OwnerPage() {
             </p>
 
             <p className="text-4xl font-[1000] text-[#0369a1]">
-              0
+              {activeBookings}
             </p>
 
           </div>
@@ -139,10 +160,21 @@ function OwnerPage() {
             {/* VIEW BOOKINGS */}
 
             <button
+              onClick={() => navigate("/owner/bookings")}
               className="bg-[#e0f2fe] hover:bg-[#bae6fd] text-[#0369a1] px-6 py-10 rounded-3xl"
             >
               <span className="text-2xl block mb-2">📅</span>
               View Bookings
+            </button>
+
+            {/* VIEW REVIEWS */}
+
+            <button
+              onClick={() => navigate("/owner/reviews")}
+              className="bg-[#fef3c7] hover:bg-[#fde68a] text-[#92400e] px-6 py-10 rounded-3xl"
+            >
+              <span className="text-2xl block mb-2">⭐</span>
+              View Reviews
             </button>
 
           </div>

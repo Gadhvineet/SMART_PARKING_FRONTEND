@@ -141,3 +141,24 @@ export const extendReservation = async (reservationId) => {
   return res.data;
 
 };
+
+// ==============================
+// ADD REVIEW
+// ==============================
+
+export const addReview = async (data) => {
+
+  const res = await axios.post(
+    `${SERVER}/reviews/create`,
+    data,
+    {
+      headers:{
+        Authorization:`Bearer ${getToken()}`
+      }
+    }
+  );
+
+  return res.data;
+
+};
+
