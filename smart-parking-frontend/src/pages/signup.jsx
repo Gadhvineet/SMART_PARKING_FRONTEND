@@ -20,6 +20,23 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Frontend Validation
+    if (!formData.name || formData.name.trim() === "") {
+      alert("Please enter your full name.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (!formData.password || formData.password.length < 5) {
+      alert("Password must be at least 5 characters long.");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match.");
       return;
@@ -31,7 +48,7 @@ function Signup() {
       alert("Account Created");
       navigate("/login");
     } catch (error) {
-      alert("Signup Error");
+      alert(error.response?.data?.message || "Signup Error");
     }
   };
 

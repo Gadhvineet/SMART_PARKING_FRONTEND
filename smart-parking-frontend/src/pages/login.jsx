@@ -20,6 +20,18 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Frontend Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (!formData.password || formData.password.trim() === "") {
+      alert("Password cannot be empty or just spaces.");
+      return;
+    }
+
     try {
       const res = await loginUser(formData);
 

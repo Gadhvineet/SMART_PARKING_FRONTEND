@@ -85,38 +85,51 @@ fetchVehicles();
 const handleBooking = async()=>{
 
 if(!selectedSlot || !selectedVehicle || !date || !startTime || !endTime){
-
-alert("Please fill all booking details");
-
-return;
-
+  alert("Please fill all booking details");
+  return;
 }
 
 // COMBINE DATE + TIME
 const startDateTime = new Date(`${date}T${startTime}`);
 const endDateTime = new Date(`${date}T${endTime}`);
+const now = new Date();
 
+// Check if booking is in the past
+if (startDateTime < now) {
+  alert("Cannot book parking for a time in the past.");
+  return;
+}
+
+// Check if end is before/same as start
 if(endDateTime <= startDateTime){
-alert("End time must be after start time");
-return;
+  alert("End time must be firmly after the start time.");
+  return;
+}
+
+// Minimum 1 hour parking check
+const diffInMs = endDateTime - startDateTime;
+if (diffInMs < 60 * 60 * 1000) {
+  alert("Minimum parking duration is 1 hour.");
+  return;
 }
 
 const data = {
-
-vehicle:selectedVehicle,
-parkingLot:selectedLot,
-slot:selectedSlot,
-
-timePeriod:{
-startTime:startDateTime,
-endTime:endDateTime
-}
-
+  vehicle:selectedVehicle,
+  parkingLot:selectedLot,
+  slot:selectedSlot,
+  timePeriod:{
+    startTime:startDateTime,
+    endTime:endDateTime
+  }
 };
 
-await createReservation(data);
-
-alert("Parking booked successfully");
+try {
+  await createReservation(data);
+  alert("Parking booked successfully");
+  window.location.href = "/user"; // Quick redirect to view bookings
+} catch (error) {
+  alert(error.response?.data?.message || "Booking Failed");
+}
 
 };
 
