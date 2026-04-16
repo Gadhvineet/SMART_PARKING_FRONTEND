@@ -29,10 +29,30 @@ export const getUserProfile = async () => {
 // UPDATE USER PROFILE
 // ==============================
 
-export const updateUserProfile = async (userId,data) => {
+export const updateUserProfile = async (data) => {
 
   const res = await axios.put(
-    `${SERVER}/api/users/update/${userId}`,
+    `${SERVER}/api/users/update`,
+    data,
+    {
+      headers:{
+        Authorization:`Bearer ${getToken()}`
+      }
+    }
+  );
+
+  return res.data;
+};
+
+
+// ==============================
+// CHANGE PASSWORD
+// ==============================
+
+export const changePassword = async (data) => {
+
+  const res = await axios.put(
+    `${SERVER}/api/users/change-password`,
     data,
     {
       headers:{

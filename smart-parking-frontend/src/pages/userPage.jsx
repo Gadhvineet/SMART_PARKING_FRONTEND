@@ -20,6 +20,7 @@ function UserPage() {
   // REVIEW STATES (ADDED)
   const [reviewReservation, setReviewReservation] = useState(null);
   const [rating, setRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
 
   const SERVER_URL = "http://localhost:5000";
@@ -201,7 +202,7 @@ function UserPage() {
       await addReview({
         reservation: reviewReservation,
         parkingLot: reservation.parkingLot,
-        rating: parseInt(rating),
+        rating: parseFloat(rating),
         comment
       });
 
@@ -210,6 +211,7 @@ function UserPage() {
       setReviewReservation(null);
       setComment("");
       setRating(5);
+      setHoverRating(0);
       
       // Refresh bookings
       fetchBookings();
@@ -221,6 +223,158 @@ function UserPage() {
 
     }
 
+  };
+
+
+  // ===============================
+  // INTERACTIVE STAR RATING (half-star support)
+  // ===============================
+  const StarRatingPicker = () => {
+    const displayRating = hoverRating || rating;
+
+    const handleStarClick = (starIndex, isLeftHalf) => {
+      const value = isLeftHalf ? starIndex + 0.5 : starIndex + 1;
+      setRating(value);
+    };
+
+    const handleStarHover = (starIndex, isLeftHalf) => {
+      const value = isLeftHalf ? starIndex + 0.5 : starIndex + 1;
+      setHoverRating(value);
+    };
+
+    return (
+      <div style={{ marginBottom: "16px" }}>
+        <p style={{
+          fontSize: "12px",
+          fontWeight: 800,
+          color: "#94a3b8",
+          textTransform: "uppercase",
+          letterSpacing: "0.1em",
+          marginBottom: "10px"
+        }}>
+          Your Rating
+        </p>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+
+          {/* 5 Stars */}
+          {[0, 1, 2, 3, 4].map((starIndex) => {
+            const fillLevel =
+              displayRating >= starIndex + 1
+                ? "full"
+                : displayRating >= starIndex + 0.5
+                ? "half"
+                : "empty";
+
+            return (
+              <div
+                key={starIndex}
+                style={{
+                  position: "relative",
+                  width: "36px",
+                  height: "36px",
+                  cursor: "pointer",
+                  fontSize: "32px",
+                  lineHeight: "36px",
+                  userSelect: "none",
+                }}
+              >
+                {/* Background empty star */}
+                <span style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  color: "#e2e8f0",
+                  filter: "grayscale(100%)",
+                  opacity: 0.5,
+                }}>
+                  ★
+                </span>
+
+                {/* Filled portion */}
+                <span style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  overflow: "hidden",
+                  width: fillLevel === "full" ? "100%" : fillLevel === "half" ? "50%" : "0%",
+                  color: hoverRating ? "#fbbf24" : "#f59e0b",
+                  transition: "width 0.15s ease, color 0.15s ease",
+                }}>
+                  ★
+                </span>
+
+                {/* Left half (0.5) click zone */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "50%",
+                    height: "100%",
+                    zIndex: 2,
+                  }}
+                  onClick={() => handleStarClick(starIndex, true)}
+                  onMouseEnter={() => handleStarHover(starIndex, true)}
+                  onMouseLeave={() => setHoverRating(0)}
+                />
+
+                {/* Right half (1.0) click zone */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    width: "50%",
+                    height: "100%",
+                    zIndex: 2,
+                  }}
+                  onClick={() => handleStarClick(starIndex, false)}
+                  onMouseEnter={() => handleStarHover(starIndex, false)}
+                  onMouseLeave={() => setHoverRating(0)}
+                />
+              </div>
+            );
+          })}
+
+          {/* Rating value badge */}
+          <span style={{
+            marginLeft: "12px",
+            background: "linear-gradient(135deg, #f59e0b, #d97706)",
+            color: "white",
+            fontWeight: 900,
+            fontSize: "14px",
+            padding: "4px 12px",
+            borderRadius: "20px",
+            minWidth: "44px",
+            textAlign: "center",
+            boxShadow: "0 2px 8px rgba(245, 158, 11, 0.3)",
+          }}>
+            {displayRating.toFixed(1)}
+          </span>
+
+        </div>
+
+        {/* Zero rating option */}
+        <button
+          type="button"
+          onClick={() => { setRating(0); setHoverRating(0); }}
+          style={{
+            marginTop: "8px",
+            fontSize: "11px",
+            color: rating === 0 ? "#ef4444" : "#94a3b8",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontWeight: 600,
+            textDecoration: "underline",
+            padding: 0,
+          }}
+        >
+          Clear rating (set to 0)
+        </button>
+      </div>
+    );
   };
 
 
@@ -502,7 +656,7 @@ function UserPage() {
 
               {/* ADD REVIEW BUTTON */}
               <button
-                onClick={() => setReviewReservation(r._id)}
+                onClick={() => { setReviewReservation(r._id); setRating(5); setHoverRating(0); setComment(""); }}
                 className="mt-3 bg-slate-900 text-white px-4 py-2 rounded text-sm"
               >
                 Add Review
@@ -512,42 +666,115 @@ function UserPage() {
 
           ))}
 
-          {/* REVIEW FORM */}
+          {/* REVIEW FORM - Interactive Star Rating */}
 
           {reviewReservation && (
 
-            <div className="bg-white p-5 mt-6 rounded-xl border">
+            <div style={{
+              background: "white",
+              padding: "28px",
+              marginTop: "24px",
+              borderRadius: "20px",
+              border: "1px solid #e2e8f0",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
+            }}>
 
-              <h3 className="font-bold mb-3">
-                Add Review
-              </h3>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                <h3 style={{ fontWeight: 900, fontSize: "18px", color: "#0f172a", margin: 0 }}>
+                  ✍️ Write a Review
+                </h3>
+                <button
+                  onClick={() => { setReviewReservation(null); setHoverRating(0); }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: "20px",
+                    cursor: "pointer",
+                    color: "#94a3b8",
+                    fontWeight: 700,
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
 
-              <select
-                value={rating}
-                onChange={(e)=>setRating(e.target.value)}
-                className="border p-2 mr-3"
-              >
-                <option value="5">⭐⭐⭐⭐⭐</option>
-                <option value="4">⭐⭐⭐⭐</option>
-                <option value="3">⭐⭐⭐</option>
-                <option value="2">⭐⭐</option>
-                <option value="1">⭐</option>
-              </select>
+              {/* Star Rating Picker */}
+              <StarRatingPicker />
 
-              <input
-                type="text"
-                placeholder="Write your comment"
-                value={comment}
-                onChange={(e)=>setComment(e.target.value)}
-                className="border p-2 mr-3"
-              />
+              {/* Comment Input */}
+              <div style={{ marginBottom: "20px" }}>
+                <p style={{
+                  fontSize: "12px",
+                  fontWeight: 800,
+                  color: "#94a3b8",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  marginBottom: "8px"
+                }}>
+                  Your Comment
+                </p>
+                <textarea
+                  placeholder="Share your experience with this parking lot..."
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  rows={3}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    border: "2px solid #e2e8f0",
+                    borderRadius: "12px",
+                    fontSize: "14px",
+                    fontFamily: "inherit",
+                    resize: "vertical",
+                    outline: "none",
+                    transition: "border-color 0.2s ease",
+                    boxSizing: "border-box",
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
+                  onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
+                />
+              </div>
 
-              <button
-                onClick={submitReview}
-                className="bg-green-600 text-white px-4 py-2 rounded"
-              >
-                Submit Review
-              </button>
+              {/* Action Buttons */}
+              <div style={{ display: "flex", gap: "12px" }}>
+                <button
+                  onClick={submitReview}
+                  style={{
+                    background: "linear-gradient(135deg, #10b981, #059669)",
+                    color: "white",
+                    padding: "12px 28px",
+                    borderRadius: "12px",
+                    border: "none",
+                    fontWeight: 800,
+                    fontSize: "14px",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 14px rgba(16, 185, 129, 0.3)",
+                    transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => { e.target.style.transform = "translateY(-1px)"; e.target.style.boxShadow = "0 6px 20px rgba(16, 185, 129, 0.4)"; }}
+                  onMouseLeave={(e) => { e.target.style.transform = "translateY(0)"; e.target.style.boxShadow = "0 4px 14px rgba(16, 185, 129, 0.3)"; }}
+                >
+                  Submit Review
+                </button>
+                <button
+                  onClick={() => { setReviewReservation(null); setHoverRating(0); }}
+                  style={{
+                    background: "#f1f5f9",
+                    color: "#64748b",
+                    padding: "12px 28px",
+                    borderRadius: "12px",
+                    border: "none",
+                    fontWeight: 700,
+                    fontSize: "14px",
+                    cursor: "pointer",
+                    transition: "background 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = "#e2e8f0"}
+                  onMouseLeave={(e) => e.target.style.background = "#f1f5f9"}
+                >
+                  Cancel
+                </button>
+              </div>
 
             </div>
 

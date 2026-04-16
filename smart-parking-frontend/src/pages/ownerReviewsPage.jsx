@@ -26,20 +26,62 @@ function OwnerReviewsPage() {
     fetchReviews();
   }, []);
 
-  // RENDER STAR RATING
+  // RENDER STAR RATING (supports half-star ratings)
   const renderStars = (rating) => {
     return (
-      <div className="flex items-center gap-1">
-        {[...Array(5)].map((_, i) => (
-          <span
-            key={i}
-            className={i < rating ? "text-yellow-400" : "text-gray-300"}
-          >
-            ⭐
-          </span>
-        ))}
-        <span className="text-sm text-slate-600 font-medium">
-          ({rating}/5)
+      <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        {[0, 1, 2, 3, 4].map((starIndex) => {
+          const fillLevel =
+            rating >= starIndex + 1
+              ? "full"
+              : rating >= starIndex + 0.5
+              ? "half"
+              : "empty";
+
+          return (
+            <div
+              key={starIndex}
+              style={{
+                position: "relative",
+                width: "24px",
+                height: "24px",
+                fontSize: "22px",
+                lineHeight: "24px",
+              }}
+            >
+              {/* Empty star background */}
+              <span style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                color: "#e2e8f0",
+              }}>
+                ★
+              </span>
+              {/* Filled portion */}
+              <span style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                overflow: "hidden",
+                width: fillLevel === "full" ? "100%" : fillLevel === "half" ? "50%" : "0%",
+                color: "#f59e0b",
+              }}>
+                ★
+              </span>
+            </div>
+          );
+        })}
+        <span style={{
+          marginLeft: "8px",
+          background: "linear-gradient(135deg, #f59e0b, #d97706)",
+          color: "white",
+          fontWeight: 800,
+          fontSize: "12px",
+          padding: "2px 10px",
+          borderRadius: "12px",
+        }}>
+          {Number(rating).toFixed(1)}/5
         </span>
       </div>
     );

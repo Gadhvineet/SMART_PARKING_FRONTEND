@@ -69,7 +69,7 @@ return ( <BrowserRouter> <Layout> <Routes>
       <Route
         path="/profile"
         element={
-          <ProtectedRoute allowedRoles={["user"]}>
+          <ProtectedRoute allowedRoles={["user", "owner", "admin"]}>
             <ProfilePage />
           </ProtectedRoute>
         }
