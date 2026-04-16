@@ -31,192 +31,192 @@ import Navbar from "./components/navbar";
 import ProtectedRoute from "./components/protectedRoute";
 
 const Layout = ({ children }) => {
-const location = useLocation();
+  const location = useLocation();
 
-const hideNavbar =
-location.pathname === "/" ||
-location.pathname === "/login" ||
-location.pathname === "/signup";
+  const hideNavbar =
+    location.pathname === "/" ||
+    location.pathname === "/login" ||
+    location.pathname === "/signup";
 
-return (
-<>
-{!hideNavbar && <Navbar />}
-{children}
-</>
-);
+  return (
+    <>
+      {!hideNavbar && <Navbar />}
+      {children}
+    </>
+  );
 };
 
 function App() {
-return ( <BrowserRouter> <Layout> <Routes>
+  return (<BrowserRouter> <Layout> <Routes>
 
-```
-      {/* PUBLIC ROUTES */}
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+    ```
+    {/* PUBLIC ROUTES */}
+    <Route path="/" element={<Home />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/signup" element={<Signup />} />
 
-      {/* USER DASHBOARD */}
-      <Route
-        path="/user"
-        element={
-          <ProtectedRoute allowedRoles={["user"]}>
-            <UserPage />
-          </ProtectedRoute>
-        }
-      />
+    {/* USER DASHBOARD */}
+    <Route
+      path="/user"
+      element={
+        <ProtectedRoute allowedRoles={["user"]}>
+          <UserPage />
+        </ProtectedRoute>
+      }
+    />
 
-      {/* USER PROFILE */}
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute allowedRoles={["user", "owner", "admin"]}>
-            <ProfilePage />
-          </ProtectedRoute>
-        }
-      />
+    {/* USER PROFILE */}
+    <Route
+      path="/profile"
+      element={
+        <ProtectedRoute allowedRoles={["user", "owner", "admin"]}>
+          <ProfilePage />
+        </ProtectedRoute>
+      }
+    />
 
-      {/* OWNER DASHBOARD */}
-      <Route
-        path="/owner"
-        element={
-          <ProtectedRoute allowedRoles={["owner"]}>
-            <OwnerPage />
-          </ProtectedRoute>
-        }
-      />
+    {/* OWNER DASHBOARD */}
+    <Route
+      path="/owner"
+      element={
+        <ProtectedRoute allowedRoles={["owner"]}>
+          <OwnerPage />
+        </ProtectedRoute>
+      }
+    />
 
-      {/* ================= ADMIN ROUTES ================= */}
+    {/* ================= ADMIN ROUTES ================= */}
 
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/admin"
+      element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+          <AdminPage />
+        </ProtectedRoute>
+      }
+    />
 
-      <Route
-        path="/admin/users"
-        element={
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminUsersPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/admin/users"
+      element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+          <AdminUsersPage />
+        </ProtectedRoute>
+      }
+    />
 
-      <Route
-        path="/admin/owners"
-        element={
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminOwnersPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/admin/owners"
+      element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+          <AdminOwnersPage />
+        </ProtectedRoute>
+      }
+    />
 
-      <Route
-        path="/admin/parkinglots"
-        element={
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminParkingLotsPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/admin/parkinglots"
+      element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+          <AdminParkingLotsPage />
+        </ProtectedRoute>
+      }
+    />
 
-      <Route
-        path="/admin/slots"
-        element={
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminSlotsPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/admin/slots"
+      element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+          <AdminSlotsPage />
+        </ProtectedRoute>
+      }
+    />
 
-      <Route
-        path="/admin/bookings"
-        element={
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminBookingsPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/admin/bookings"
+      element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+          <AdminBookingsPage />
+        </ProtectedRoute>
+      }
+    />
 
-      {/* ================= USER FEATURES ================= */}
+    {/* ================= USER FEATURES ================= */}
 
-      <Route
-        path="/vehicles"
-        element={
-          <ProtectedRoute allowedRoles={["user", "owner"]}>
-            <VehiclesPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/vehicles"
+      element={
+        <ProtectedRoute allowedRoles={["user", "owner"]}>
+          <VehiclesPage />
+        </ProtectedRoute>
+      }
+    />
 
-      <Route
-        path="/find-parking"
-        element={
-          <ProtectedRoute allowedRoles={["user"]}>
-            <FindParkingPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/find-parking"
+      element={
+        <ProtectedRoute allowedRoles={["user"]}>
+          <FindParkingPage />
+        </ProtectedRoute>
+      }
+    />
 
-      {/* ================= OWNER FEATURES ================= */}
+    {/* ================= OWNER FEATURES ================= */}
 
-      <Route
-        path="/owner/add-parking"
-        element={
-          <ProtectedRoute allowedRoles={["owner"]}>
-            <AddParkingPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/owner/add-parking"
+      element={
+        <ProtectedRoute allowedRoles={["owner"]}>
+          <AddParkingPage />
+        </ProtectedRoute>
+      }
+    />
 
-      <Route
-        path="/owner/parkinglots"
-        element={
-          <ProtectedRoute allowedRoles={["owner"]}>
-            <ParkingLotsPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/owner/parkinglots"
+      element={
+        <ProtectedRoute allowedRoles={["owner"]}>
+          <ParkingLotsPage />
+        </ProtectedRoute>
+      }
+    />
 
-      <Route
-        path="/owner/slots/:parkingLotId"
-        element={
-          <ProtectedRoute allowedRoles={["owner"]}>
-            <OwnerSlotsPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/owner/slots/:parkingLotId"
+      element={
+        <ProtectedRoute allowedRoles={["owner"]}>
+          <OwnerSlotsPage />
+        </ProtectedRoute>
+      }
+    />
 
-      {/* OWNER BOOKINGS PAGE */}
+    {/* OWNER BOOKINGS PAGE */}
 
-      <Route
-        path="/owner/bookings"
-        element={
-          <ProtectedRoute allowedRoles={["owner"]}>
-            <OwnerBookings />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/owner/bookings"
+      element={
+        <ProtectedRoute allowedRoles={["owner"]}>
+          <OwnerBookings />
+        </ProtectedRoute>
+      }
+    />
 
-      {/* OWNER REVIEWS PAGE */}
+    {/* OWNER REVIEWS PAGE */}
 
-      <Route
-        path="/owner/reviews"
-        element={
-          <ProtectedRoute allowedRoles={["owner"]}>
-            <OwnerReviewsPage />
-          </ProtectedRoute>
-        }
-      />
+    <Route
+      path="/owner/reviews"
+      element={
+        <ProtectedRoute allowedRoles={["owner"]}>
+          <OwnerReviewsPage />
+        </ProtectedRoute>
+      }
+    />
 
-    </Routes>
+  </Routes>
   </Layout>
-</BrowserRouter>
+  </BrowserRouter>
 
-);
+  );
 }
 
 export default App;

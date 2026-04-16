@@ -48,8 +48,26 @@ export const deleteUser = (id) => {
   });
 };
 
+export const updateUserStatus = (id, status) => {
+  return axios.patch(`${API}/users/${id}/status`, { status }, {
+    headers: { Authorization: `Bearer ${getToken()}` }
+  });
+};
+
 export const deleteParkingLot = (id) => {
   return axios.delete(`${API}/parkinglots/${id}`, {
+    headers: { Authorization: `Bearer ${getToken()}` }
+  });
+};
+
+export const cancelBooking = (id) => {
+  return axios.patch(`${API}/bookings/${id}/cancel`, {}, {
+    headers: { Authorization: `Bearer ${getToken()}` }
+  });
+};
+
+export const reportBookingOwner = (id, message) => {
+  return axios.post(`${API}/bookings/${id}/report`, { message }, {
     headers: { Authorization: `Bearer ${getToken()}` }
   });
 };

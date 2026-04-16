@@ -38,7 +38,7 @@ function AdminPage() {
 
       {/* 🔹 MAIN CONTENT */}
       <div className="max-w-7xl mx-auto p-6 md:p-12">
-        
+
         <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h2 className="text-4xl font-[1000] tracking-tighter text-slate-900">
