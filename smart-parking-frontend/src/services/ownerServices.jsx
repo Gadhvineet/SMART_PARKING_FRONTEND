@@ -124,6 +124,16 @@ export const getActiveBookings = async () => {
   return res.data.count;
 };
 
+// GET OWNER ANALYTICS
+export const getOwnerAnalytics = async () => {
+  const res = await axios.get(
+    `${SERVER_URL}/reservations/owner-analytics`,
+    authHeader()
+  );
+
+  return res.data;
+};
+
 // ===============================
 // OWNER BOOKING ACTIONS
 // ===============================

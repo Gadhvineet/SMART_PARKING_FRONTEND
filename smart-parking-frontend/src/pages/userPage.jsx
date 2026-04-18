@@ -553,6 +553,10 @@ function UserPage() {
                   {new Date(r.timePeriod.endTime).toLocaleTimeString()}
                 </p>
 
+                {r.parkingLot?.location?.googleMapsLink && (
+                  <a href={r.parkingLot.location.googleMapsLink} target="_blank" rel="noreferrer" className="text-blue-500 text-xs mt-2 inline-block font-semibold ml-1">📍 View on Maps</a>
+                )}
+
               </div>
 
               <div className="flex gap-2">
@@ -612,6 +616,10 @@ function UserPage() {
               <p className="text-xs text-slate-400">
                 Starts: {new Date(r.timePeriod.startTime).toLocaleString()}
               </p>
+              
+              {r.parkingLot?.location?.googleMapsLink && (
+                <a href={r.parkingLot.location.googleMapsLink} target="_blank" rel="noreferrer" className="text-blue-500 text-xs mt-2 inline-block font-semibold ml-1">📍 View on Maps</a>
+              )}
 
             </div>
 
@@ -653,6 +661,10 @@ function UserPage() {
                 {new Date(r.timePeriod.startTime).toLocaleString()} -
                 {new Date(r.timePeriod.endTime).toLocaleString()}
               </p>
+
+              {r.parkingLot?.location?.googleMapsLink && (
+                <a href={r.parkingLot.location.googleMapsLink} target="_blank" rel="noreferrer" className="text-blue-500 text-xs mt-2 inline-block font-semibold ml-1">📍 View on Maps</a>
+              )}
 
               {/* ADD REVIEW BUTTON */}
               <button

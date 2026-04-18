@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { createReservation, getUserVehicles } from "../services/userServices";
+import { getRazorpayKey, createOrder, verifyPayment } from "../services/paymentServices";
+
+const loadScript = (src) => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
 
 function FindParkingPage() {
 
@@ -123,15 +134,78 @@ const data = {
   }
 };
 
-try {
-  await createReservation(data);
-  alert("Parking booked successfully");
-  window.location.href = "/user"; // Quick redirect to view bookings
-} catch (error) {
-  alert(error.response?.data?.message || "Booking Failed");
-}
+    try {
+      // 1. Create Reservation
+      const resData = await createReservation(data);
+      const reservation = resData.reservation;
+      
+      // 2. Load Razorpay Script
+      const isLoaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+      if (!isLoaded) {
+        alert("Payment gateway failed to load. Please check your connection.");
+        return;
+      }
+      
+      // 3. Get total amount
+      let amount = 0;
+      if (pricePreview && pricePreview.total) {
+        amount = parseFloat(pricePreview.total);
+      } else {
+        alert("Could not calculate payment amount.");
+        return;
+      }
+      
+      // 4. Create Order
+      const orderRes = await createOrder({
+        amount: amount,
+        reservation: reservation._id,
+        user: reservation.user,
+        paymentMethod: 'card'
+      });
+      
+      // 5. Get Razorpay Key
+      const keyRes = await getRazorpayKey();
+      
+      // 6. Open Razorpay Checkout
+      const options = {
+        key: keyRes.key,
+        amount: orderRes.order.amount,
+        currency: orderRes.order.currency,
+        name: "Smart Parking System",
+        description: "Parking Reservation Payment",
+        order_id: orderRes.order.id,
+        handler: async function (response) {
+            try {
+                // 7. Verify Payment
+                await verifyPayment({
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                    paymentId: orderRes.paymentId
+                });
+                
+                alert("Reservation confirmed! Payment successful.");
+                window.location.href = "/user";
+            } catch (err) {
+                alert("Payment verification failed! " + (err.response?.data?.message || err.message));
+            }
+        },
+        theme: {
+            color: "#0f172a"
+        }
+      };
+      
+      const rzp1 = new window.Razorpay(options);
+      rzp1.on('payment.failed', function (response){
+          alert("Payment failed! Please check your bookings in dashboard and try again later.");
+      });
+      rzp1.open();
 
-};
+    } catch (error) {
+      alert(error.response?.data?.message || "Booking Failed");
+    }
+
+  };
 
 
 useEffect(()=>{
@@ -629,6 +703,35 @@ return(
               ))}
             </div>
 
+            {/* VIEW ON MAP BUTTON (IF EXISTS) */}
+            {parking.location?.googleMapsLink && (
+              <a
+                href={parking.location.googleMapsLink}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  display: "block",
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "10px",
+                  border: "1px solid #e2e8f0",
+                  background: "#f8fafc",
+                  color: "#3b82f6",
+                  fontWeight: 800,
+                  fontSize: "12px",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  textAlign: "center",
+                  textDecoration: "none",
+                  cursor: "pointer",
+                  marginBottom: "10px",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                📍 View on Google Maps
+              </a>
+            )}
+
             {/* BOOK BUTTON */}
             <button
               onClick={() => handleSelectLot(parking._id)}
@@ -923,7 +1026,7 @@ return(
           e.target.style.boxShadow = "0 8px 24px rgba(14,165,233,0.3)";
         }}
       >
-        Reserve Parking
+        Pay Now
       </button>
 
     </div>

@@ -13,7 +13,8 @@ function AddParkingPage() {
     city: "",
     pincode: "",
     totalSlots: "",
-    pricePerHour: ""
+    pricePerHour: "",
+    googleMapsLink: ""
   });
 
   const [supportedVehicleTypes, setSupportedVehicleTypes] = useState([
@@ -49,7 +50,8 @@ function AddParkingPage() {
       location: {
         address: form.address,
         city: form.city,
-        pincode: Number(form.pincode)
+        pincode: Number(form.pincode),
+        googleMapsLink: form.googleMapsLink
       },
       totalSlots: Number(form.totalSlots),
       availableSlots: Number(form.totalSlots),
@@ -101,6 +103,7 @@ function AddParkingPage() {
         <input name="address" placeholder="Address" onChange={handleChange} style={inputStyle}/>
         <input name="city" placeholder="City" onChange={handleChange} style={inputStyle}/>
         <input name="pincode" placeholder="Pincode" onChange={handleChange} style={inputStyle}/>
+        <input name="googleMapsLink" placeholder="Google Maps Link (Optional)" type="url" onChange={handleChange} style={inputStyle}/>
         <input name="totalSlots" placeholder="Total Slots" onChange={handleChange} required style={inputStyle}/>
         <input name="pricePerHour" placeholder="Price Per Hour" onChange={handleChange} required style={inputStyle}/>
 
