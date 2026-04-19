@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
 import {
   getUserVehicles,
   getUserReservations,
@@ -22,6 +23,9 @@ function UserPage() {
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
+  const [reviewedIds, setReviewedIds] = useState(new Set());
+
+  const reviewFormRef = useRef(null);
 
   const SERVER_URL = "http://localhost:5000";
 
@@ -116,11 +120,45 @@ function UserPage() {
   };
 
 
+  // ===============================
+  // FETCH REVIEWED RESERVATION IDS
+  // ===============================
+  const fetchReviewedIds = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      // Fetch all reviews by this user by checking all history reservations
+      // We'll use a simple approach: fetch reviews for user from all their reservations
+      const res = await getUserReservations();
+      const bookings = res.reservations || [];
+      const reservationIds = bookings.map(b => b._id);
+
+      // Check each reservation for an existing review
+      const reviewed = new Set();
+      for (const resId of reservationIds) {
+        try {
+          const reviewRes = await axios.get(
+            `${SERVER_URL}/reviews/check/${resId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          if (reviewRes.data.hasReview) {
+            reviewed.add(resId);
+          }
+        } catch (e) {
+          // Endpoint might not exist yet, ignore
+        }
+      }
+      setReviewedIds(reviewed);
+    } catch (error) {
+      console.log("Error fetching reviewed IDs:", error);
+    }
+  };
+
   useEffect(() => {
 
     fetchUserProfile();
     fetchVehicles();
     fetchBookings();
+    fetchReviewedIds();
 
     const interval = setInterval(fetchBookings, 30000);
 
@@ -207,6 +245,9 @@ function UserPage() {
       });
 
       alert("Review submitted successfully");
+
+      // Mark this reservation as reviewed
+      setReviewedIds(prev => new Set([...prev, reviewReservation]));
 
       setReviewReservation(null);
       setComment("");
@@ -666,13 +707,30 @@ function UserPage() {
                 <a href={r.parkingLot.location.googleMapsLink} target="_blank" rel="noreferrer" className="text-blue-500 text-xs mt-2 inline-block font-semibold ml-1">📍 View on Maps</a>
               )}
 
-              {/* ADD REVIEW BUTTON */}
-              <button
-                onClick={() => { setReviewReservation(r._id); setRating(5); setHoverRating(0); setComment(""); }}
-                className="mt-3 bg-slate-900 text-white px-4 py-2 rounded text-sm"
-              >
-                Add Review
-              </button>
+              {/* ADD REVIEW BUTTON — only for completed (non-cancelled, past endTime) & not already reviewed */}
+              {r.status !== "cancelled" && new Date(r.timePeriod.endTime) < new Date() && (
+                reviewedIds.has(r._id) ? (
+                  <span className="mt-3 inline-block text-green-600 text-xs font-bold bg-green-50 px-4 py-2 rounded-lg border border-green-200">
+                    ✅ Reviewed
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setReviewReservation(r._id);
+                      setRating(5);
+                      setHoverRating(0);
+                      setComment("");
+                      // Auto-scroll to review form after state update
+                      setTimeout(() => {
+                        reviewFormRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                      }, 100);
+                    }}
+                    className="mt-3 bg-slate-900 text-white px-4 py-2 rounded text-sm"
+                  >
+                    ⭐ Add Review
+                  </button>
+                )
+              )}
 
             </div>
 
@@ -682,7 +740,7 @@ function UserPage() {
 
           {reviewReservation && (
 
-            <div style={{
+            <div ref={reviewFormRef} style={{
               background: "white",
               padding: "28px",
               marginTop: "24px",

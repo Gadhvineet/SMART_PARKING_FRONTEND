@@ -28,6 +28,15 @@ const [date,setDate] = useState("");
 const [startTime,setStartTime] = useState("");
 const [endTime,setEndTime] = useState("");
 
+// Today's date in YYYY-MM-DD for min attribute
+const getTodayStr = () => {
+  const now = new Date();
+  return now.getFullYear() + '-' +
+    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+    String(now.getDate()).padStart(2, '0');
+};
+const todayStr = getTodayStr();
+
 // ============================
 // SEARCH & FILTER STATES
 // ============================
@@ -105,9 +114,23 @@ const startDateTime = new Date(`${date}T${startTime}`);
 const endDateTime = new Date(`${date}T${endTime}`);
 const now = new Date();
 
-// Check if booking is in the past
+// Check if selected date itself is in the past
+const selectedDate = new Date(date);
+const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+if (selectedDate < todayDate) {
+  alert("Cannot book parking for a past date. Please select today or a future date.");
+  return;
+}
+
+// Check if booking start time is in the past (same day scenario)
 if (startDateTime < now) {
-  alert("Cannot book parking for a time in the past.");
+  alert("Cannot book parking for a time that has already passed. Please select a future start time.");
+  return;
+}
+
+// Check if end time is in the past
+if (endDateTime <= now) {
+  alert("End time must be in the future.");
   return;
 }
 
@@ -135,18 +158,14 @@ const data = {
 };
 
     try {
-      // 1. Create Reservation
-      const resData = await createReservation(data);
-      const reservation = resData.reservation;
-      
-      // 2. Load Razorpay Script
+      // 1. Load Razorpay Script FIRST (before any reservation)
       const isLoaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
       if (!isLoaded) {
         alert("Payment gateway failed to load. Please check your connection.");
         return;
       }
       
-      // 3. Get total amount
+      // 2. Get total amount
       let amount = 0;
       if (pricePreview && pricePreview.total) {
         amount = parseFloat(pricePreview.total);
@@ -154,12 +173,15 @@ const data = {
         alert("Could not calculate payment amount.");
         return;
       }
+
+      // 3. Get logged-in user ID from token
+      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+      const userId = tokenPayload.id;
       
-      // 4. Create Order
+      // 4. Create Razorpay Order (NO reservation yet — payment first!)
       const orderRes = await createOrder({
         amount: amount,
-        reservation: reservation._id,
-        user: reservation.user,
+        user: userId,
         paymentMethod: 'card'
       });
       
@@ -176,7 +198,7 @@ const data = {
         order_id: orderRes.order.id,
         handler: async function (response) {
             try {
-                // 7. Verify Payment
+                // 7. Verify Payment FIRST
                 await verifyPayment({
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,
@@ -184,10 +206,19 @@ const data = {
                     paymentId: orderRes.paymentId
                 });
                 
-                alert("Reservation confirmed! Payment successful.");
+                // 8. Payment verified → NOW create reservation (slot gets locked only here)
+                const resData = await createReservation(data);
+                
+                alert("Payment successful! Your parking slot has been reserved.");
                 window.location.href = "/user";
             } catch (err) {
-                alert("Payment verification failed! " + (err.response?.data?.message || err.message));
+                alert("Error: " + (err.response?.data?.message || err.message));
+            }
+        },
+        modal: {
+            ondismiss: function () {
+                // User closed the payment modal — do nothing, slot stays free
+                alert("Payment cancelled. No slot has been reserved.");
             }
         },
         theme: {
@@ -197,7 +228,8 @@ const data = {
       
       const rzp1 = new window.Razorpay(options);
       rzp1.on('payment.failed', function (response){
-          alert("Payment failed! Please check your bookings in dashboard and try again later.");
+          // Payment failed — do nothing, slot stays free
+          alert("Payment failed! No slot has been reserved. Please try again.");
       });
       rzp1.open();
 
@@ -901,74 +933,436 @@ return(
       </div>
 
 
-      {/* DATE & TIME SELECTOR */}
-      <div style={{ marginBottom: "24px" }}>
+      {/* DATE & TIME SELECTOR — REDESIGNED */}
+      <div style={{ marginBottom: "28px" }}>
         <p style={{
           fontSize: "12px",
           fontWeight: 800,
           color: "#94a3b8",
           textTransform: "uppercase",
           letterSpacing: "0.1em",
-          marginBottom: "10px",
-        }}>Date & Time</p>
+          marginBottom: "14px",
+        }}>📅 Schedule Your Parking</p>
 
-        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
-
-          <div>
-            <label style={{ fontSize: "11px", fontWeight: 700, color: "#64748b", display: "block", marginBottom: "4px" }}>Date</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              style={{
-                padding: "12px 16px",
-                borderRadius: "12px",
-                border: "2px solid #e2e8f0",
-                fontSize: "14px",
-                fontWeight: 700,
-                fontFamily: "inherit",
-                outline: "none",
-              }}
-            />
+        {/* DATE CARD */}
+        <div style={{
+          background: "linear-gradient(135deg, #f8fafc, #f1f5f9)",
+          borderRadius: "16px",
+          padding: "18px 20px",
+          border: date && date < todayStr ? "2px solid #ef4444" : "1px solid #e2e8f0",
+          marginBottom: "16px",
+          transition: "all 0.2s ease",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+            <span style={{
+              fontSize: "22px",
+              width: "40px",
+              height: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#fff",
+              borderRadius: "12px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+            }}>📅</span>
+            <div>
+              <p style={{ fontSize: "13px", fontWeight: 800, color: "#0f172a" }}>Parking Date</p>
+              <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8" }}>Select today or a future date</p>
+            </div>
           </div>
-
-          <div>
-            <label style={{ fontSize: "11px", fontWeight: 700, color: "#64748b", display: "block", marginBottom: "4px" }}>Start Time</label>
-            <input
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              style={{
-                padding: "12px 16px",
-                borderRadius: "12px",
-                border: "2px solid #e2e8f0",
-                fontSize: "14px",
-                fontWeight: 700,
-                fontFamily: "inherit",
-                outline: "none",
-              }}
-            />
-          </div>
-
-          <div>
-            <label style={{ fontSize: "11px", fontWeight: 700, color: "#64748b", display: "block", marginBottom: "4px" }}>End Time</label>
-            <input
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              style={{
-                padding: "12px 16px",
-                borderRadius: "12px",
-                border: "2px solid #e2e8f0",
-                fontSize: "14px",
-                fontWeight: 700,
-                fontFamily: "inherit",
-                outline: "none",
-              }}
-            />
-          </div>
-
+          <input
+            type="date"
+            value={date}
+            min={todayStr}
+            onChange={(e) => setDate(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "14px 16px",
+              borderRadius: "12px",
+              border: date && date < todayStr ? "2px solid #ef4444" : "2px solid #e2e8f0",
+              fontSize: "15px",
+              fontWeight: 700,
+              fontFamily: "inherit",
+              outline: "none",
+              background: date && date < todayStr ? "#fef2f2" : "#fff",
+              boxSizing: "border-box",
+              cursor: "pointer",
+              transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+            }}
+            onFocus={(e) => {
+              if (!(date && date < todayStr)) {
+                e.target.style.borderColor = "#3b82f6";
+                e.target.style.boxShadow = "0 0 0 4px rgba(59,130,246,0.1)";
+              }
+            }}
+            onBlur={(e) => {
+              if (!(date && date < todayStr)) {
+                e.target.style.borderColor = "#e2e8f0";
+                e.target.style.boxShadow = "none";
+              }
+            }}
+          />
+          {date && date < todayStr && (
+            <p style={{ fontSize: "11px", color: "#ef4444", fontWeight: 700, marginTop: "6px", display: "flex", alignItems: "center", gap: "4px" }}>
+              ⚠️ Past date selected — please pick today or later
+            </p>
+          )}
+          {date === todayStr && (
+            <p style={{ fontSize: "11px", color: "#0ea5e9", fontWeight: 700, marginTop: "6px", display: "flex", alignItems: "center", gap: "4px" }}>
+              ℹ️ Today selected — only future time slots are available
+            </p>
+          )}
         </div>
+
+        {/* TIME SLOT GRIDS */}
+        {(() => {
+          // Generate time slots in 30-min intervals from 06:00 to 23:30
+          const allSlots = [];
+          for (let h = 6; h < 24; h++) {
+            for (let m = 0; m < 60; m += 30) {
+              const hh = String(h).padStart(2, '0');
+              const mm = String(m).padStart(2, '0');
+              const val24 = `${hh}:${mm}`;
+              // 12-hour display label
+              const period = h >= 12 ? 'PM' : 'AM';
+              const h12 = h % 12 === 0 ? 12 : h % 12;
+              const label = `${h12}:${mm} ${period}`;
+              allSlots.push({ val24, label });
+            }
+          }
+
+          // Determine which start slots are in the past (if today)
+          const nowDate = new Date();
+          const nowMins = nowDate.getHours() * 60 + nowDate.getMinutes();
+          const isToday = date === todayStr;
+
+          // For end time, only show slots after selected start
+          const startMins = startTime ? (() => {
+            const [sh, sm] = startTime.split(':').map(Number);
+            return sh * 60 + sm;
+          })() : null;
+
+          return (
+            <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+
+              {/* START TIME SECTION */}
+              <div style={{
+                flex: 1,
+                minWidth: "240px",
+                background: "linear-gradient(135deg, #f0fdf4, #ecfdf5)",
+                borderRadius: "16px",
+                padding: "18px 20px",
+                border: "1px solid #bbf7d0",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+                  <span style={{
+                    fontSize: "20px",
+                    width: "38px",
+                    height: "38px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "#fff",
+                    borderRadius: "10px",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                  }}>🕐</span>
+                  <div>
+                    <p style={{ fontSize: "13px", fontWeight: 800, color: "#15803d" }}>Start Time</p>
+                    <p style={{ fontSize: "10px", fontWeight: 600, color: "#86efac" }}>When you arrive</p>
+                  </div>
+                  {startTime && (
+                    <span style={{
+                      marginLeft: "auto",
+                      background: "#15803d",
+                      color: "#fff",
+                      padding: "4px 12px",
+                      borderRadius: "8px",
+                      fontSize: "13px",
+                      fontWeight: 800,
+                    }}>
+                      {allSlots.find(s => s.val24 === startTime)?.label || startTime}
+                    </span>
+                  )}
+                </div>
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(85px, 1fr))",
+                  gap: "6px",
+                  maxHeight: "180px",
+                  overflowY: "auto",
+                  paddingRight: "4px",
+                }}>
+                  {allSlots.map((slot) => {
+                    const [sh, sm] = slot.val24.split(':').map(Number);
+                    const slotMins = sh * 60 + sm;
+                    const isPast = isToday && slotMins <= nowMins;
+                    const isActive = startTime === slot.val24;
+                    return (
+                      <button
+                        key={`start-${slot.val24}`}
+                        onClick={() => {
+                          if (!isPast) {
+                            setStartTime(slot.val24);
+                            // Auto-clear end time if it's now invalid
+                            if (endTime) {
+                              const [eh, em] = endTime.split(':').map(Number);
+                              if (eh * 60 + em <= slotMins + 60) {
+                                setEndTime("");
+                              }
+                            }
+                          }
+                        }}
+                        disabled={isPast}
+                        style={{
+                          padding: "8px 4px",
+                          borderRadius: "10px",
+                          border: isActive ? "2px solid #15803d" : "1px solid #d1fae5",
+                          background: isPast ? "#f1f5f9" : isActive ? "#15803d" : "#fff",
+                          color: isPast ? "#cbd5e1" : isActive ? "#fff" : "#1e293b",
+                          fontSize: "12px",
+                          fontWeight: isActive ? 900 : 700,
+                          cursor: isPast ? "not-allowed" : "pointer",
+                          transition: "all 0.15s ease",
+                          opacity: isPast ? 0.5 : 1,
+                          textDecoration: isPast ? "line-through" : "none",
+                        }}
+                      >
+                        {slot.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* ARROW CONNECTOR */}
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "0 4px",
+                minWidth: "40px",
+              }}>
+                <div style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "4px",
+                }}>
+                  <span style={{
+                    fontSize: "28px",
+                    color: "#64748b",
+                    fontWeight: 900,
+                    lineHeight: 1,
+                  }}>→</span>
+                  <span style={{
+                    fontSize: "9px",
+                    fontWeight: 800,
+                    color: "#94a3b8",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                  }}>to</span>
+                </div>
+              </div>
+
+              {/* END TIME SECTION */}
+              <div style={{
+                flex: 1,
+                minWidth: "240px",
+                background: "linear-gradient(135deg, #eff6ff, #dbeafe)",
+                borderRadius: "16px",
+                padding: "18px 20px",
+                border: "1px solid #93c5fd",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+                  <span style={{
+                    fontSize: "20px",
+                    width: "38px",
+                    height: "38px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "#fff",
+                    borderRadius: "10px",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                  }}>🕑</span>
+                  <div>
+                    <p style={{ fontSize: "13px", fontWeight: 800, color: "#1d4ed8" }}>End Time</p>
+                    <p style={{ fontSize: "10px", fontWeight: 600, color: "#93c5fd" }}>When you leave</p>
+                  </div>
+                  {endTime && (
+                    <span style={{
+                      marginLeft: "auto",
+                      background: "#1d4ed8",
+                      color: "#fff",
+                      padding: "4px 12px",
+                      borderRadius: "8px",
+                      fontSize: "13px",
+                      fontWeight: 800,
+                    }}>
+                      {allSlots.find(s => s.val24 === endTime)?.label || endTime}
+                    </span>
+                  )}
+                </div>
+
+                {!startTime ? (
+                  <div style={{
+                    padding: "24px",
+                    textAlign: "center",
+                    color: "#94a3b8",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    background: "rgba(255,255,255,0.6)",
+                    borderRadius: "12px",
+                    border: "1px dashed #bfdbfe",
+                  }}>
+                    ← Select a start time first
+                  </div>
+                ) : (
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(85px, 1fr))",
+                    gap: "6px",
+                    maxHeight: "180px",
+                    overflowY: "auto",
+                    paddingRight: "4px",
+                  }}>
+                    {allSlots
+                      .filter((slot) => {
+                        const [eh, em] = slot.val24.split(':').map(Number);
+                        const endMins = eh * 60 + em;
+                        // Must be at least 1 hour after start
+                        return startMins !== null && endMins >= startMins + 60;
+                      })
+                      .map((slot) => {
+                        const isActive = endTime === slot.val24;
+                        // Calculate duration for this option
+                        const [eh, em] = slot.val24.split(':').map(Number);
+                        const durHrs = ((eh * 60 + em) - startMins) / 60;
+                        return (
+                          <button
+                            key={`end-${slot.val24}`}
+                            onClick={() => setEndTime(slot.val24)}
+                            style={{
+                              padding: "8px 4px",
+                              borderRadius: "10px",
+                              border: isActive ? "2px solid #1d4ed8" : "1px solid #bfdbfe",
+                              background: isActive ? "#1d4ed8" : "#fff",
+                              color: isActive ? "#fff" : "#1e293b",
+                              fontSize: "12px",
+                              fontWeight: isActive ? 900 : 700,
+                              cursor: "pointer",
+                              transition: "all 0.15s ease",
+                              position: "relative",
+                            }}
+                          >
+                            {slot.label}
+                            <span style={{
+                              display: "block",
+                              fontSize: "9px",
+                              fontWeight: 600,
+                              color: isActive ? "#bfdbfe" : "#94a3b8",
+                              marginTop: "1px",
+                            }}>
+                              {durHrs}h
+                            </span>
+                          </button>
+                        );
+                      })
+                    }
+                  </div>
+                )}
+              </div>
+
+            </div>
+          );
+        })()}
+
+        {/* DURATION SUMMARY */}
+        {startTime && endTime && (() => {
+          const [sh, sm] = startTime.split(':').map(Number);
+          const [eh, em] = endTime.split(':').map(Number);
+          const diffH = ((eh * 60 + em) - (sh * 60 + sm)) / 60;
+          if (diffH <= 0) return (
+            <div style={{
+              marginTop: "12px",
+              padding: "12px 18px",
+              borderRadius: "12px",
+              background: "#fef2f2",
+              border: "1px solid #fecaca",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}>
+              <span style={{ fontSize: "18px" }}>⚠️</span>
+              <p style={{ fontSize: "13px", fontWeight: 700, color: "#dc2626" }}>
+                End time must be after start time
+              </p>
+            </div>
+          );
+          if (diffH < 1) return (
+            <div style={{
+              marginTop: "12px",
+              padding: "12px 18px",
+              borderRadius: "12px",
+              background: "#fffbeb",
+              border: "1px solid #fde68a",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}>
+              <span style={{ fontSize: "18px" }}>⏱️</span>
+              <p style={{ fontSize: "13px", fontWeight: 700, color: "#d97706" }}>
+                Minimum parking duration is 1 hour
+              </p>
+            </div>
+          );
+          // Convert 24h to 12h label inline (allSlots is not in scope here)
+          const fmt12 = (t) => {
+            const [hh, mm] = t.split(':').map(Number);
+            const period = hh >= 12 ? 'PM' : 'AM';
+            const h12 = hh % 12 === 0 ? 12 : hh % 12;
+            return `${h12}:${String(mm).padStart(2,'0')} ${period}`;
+          };
+          const startLabel = fmt12(startTime);
+          const endLabel = fmt12(endTime);
+          return (
+            <div style={{
+              marginTop: "12px",
+              padding: "14px 20px",
+              borderRadius: "14px",
+              background: "linear-gradient(135deg, #f0fdf4, #eff6ff)",
+              border: "1px solid #bbf7d0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "8px",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ fontSize: "18px" }}>✅</span>
+                <div>
+                  <p style={{ fontSize: "13px", fontWeight: 800, color: "#15803d" }}>
+                    {startLabel} → {endLabel}
+                  </p>
+                  <p style={{ fontSize: "11px", fontWeight: 600, color: "#86efac" }}>
+                    Your scheduled parking window
+                  </p>
+                </div>
+              </div>
+              <span style={{
+                background: "#0f172a",
+                color: "#fff",
+                padding: "6px 16px",
+                borderRadius: "10px",
+                fontSize: "14px",
+                fontWeight: 900,
+              }}>
+                {diffH} hour{diffH !== 1 ? "s" : ""}
+              </span>
+            </div>
+          );
+        })()}
+
       </div>
 
 
