@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getOwnerAnalytics } from "../services/ownerServices";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, BarChart, Bar } from "recharts";
 
+
 function OwnerPage() {
 
   const navigate = useNavigate();
@@ -19,9 +20,7 @@ function OwnerPage() {
     totalBookings: 0,
     trendData: [],
     lotData: []
-  });
-
-  const SERVER_URL = "http://localhost:5000";
+  });const SERVER_URL = import.meta.env.VITE_API_URL;
 
   // FETCH OWNER PARKING LOTS (Kept for basic lot counts)
   const fetchParkingLots = async () => {

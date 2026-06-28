@@ -16,12 +16,12 @@ function VehiclesPage() {
   const [editId, setEditId] = useState(null);
 
   const token = localStorage.getItem("token");
-  const SERVER_URL = "http://localhost:5000";
+  const SERVER_URL = import.meta.env.VITE_API_URL;
 
   // FETCH VEHICLES
   const fetchVehicles = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/vehicles/get", {
+      const res = await axios.get(`${SERVER_URL}/vehicles/get`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -34,7 +34,7 @@ function VehiclesPage() {
 
   useEffect(() => {
     fetchVehicles();
-    window.scrollTo({top:400,behavior:"smooth"});
+    window.scrollTo({ top: 400, behavior: "smooth" });
   }, []);
 
   useEffect(() => {
@@ -73,10 +73,10 @@ function VehiclesPage() {
 
     if (name === "image") {
       setForm({ ...form, image: files[0] });
-    } 
+    }
     else if (name === "vehicleNumber") {
       setForm({ ...form, vehicleNumber: value.toUpperCase() });
-    } 
+    }
     else {
       setForm({ ...form, [name]: value });
     }
@@ -101,7 +101,7 @@ function VehiclesPage() {
 
       if (editId) {
         await axios.put(
-          `http://localhost:5000/vehicles/update/${editId}`,
+          `${SERVER_URL}/vehicles/update/${editId}`,
           formData,
           {
             headers: {
@@ -111,10 +111,10 @@ function VehiclesPage() {
           }
         );
         setEditId(null);
-      } 
+      }
       else {
         await axios.post(
-          "http://localhost:5000/vehicles/create",
+          `${SERVER_URL}/vehicles/create`,
           formData,
           {
             headers: {
@@ -151,7 +151,7 @@ function VehiclesPage() {
   // DELETE
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/vehicles/delete/${id}`, {
+      await axios.delete(`${SERVER_URL}/vehicles/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

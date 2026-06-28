@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const SERVER_URL = import.meta.env.VITE_API_URL;
+
 function AddParkingPage() {
 
   const navigate = useNavigate();
@@ -62,7 +64,7 @@ function AddParkingPage() {
     try {
 
       await axios.post(
-        "http://localhost:5000/parkinglots/create",
+        `${SERVER_URL}/parkinglots/create`,
         data,
         { headers: { Authorization: `Bearer ${token}` } }
       );

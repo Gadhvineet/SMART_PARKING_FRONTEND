@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const SERVER_URL = import.meta.env.VITE_API_URL;
+
 function ParkingLotsPage() {
 
   const token = localStorage.getItem("token");
@@ -14,7 +16,7 @@ function ParkingLotsPage() {
   const fetchParkingLots = async () => {
 
     const res = await axios.get(
-      "http://localhost:5000/parkinglots/get",
+      `${SERVER_URL}/parkinglots/get`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
@@ -35,7 +37,7 @@ function ParkingLotsPage() {
     if (!confirmDelete) return;
 
     await axios.delete(
-      `http://localhost:5000/parkinglots/delete/${id}`,
+      `${SERVER_URL}/parkinglots/delete/${id}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
@@ -85,7 +87,7 @@ function ParkingLotsPage() {
     };
 
     await axios.put(
-      `http://localhost:5000/parkinglots/update/${id}`,
+      `${SERVER_URL}/parkinglots/update/${id}`,
       data,
       { headers: { Authorization: `Bearer ${token}` } }
     );

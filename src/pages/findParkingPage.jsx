@@ -3,6 +3,8 @@ import axios from "axios";
 import { createReservation, getUserVehicles } from "../services/userServices";
 import { getRazorpayKey, createOrder, verifyPayment } from "../services/paymentServices";
 
+const SERVER_URL = import.meta.env.VITE_API_URL;
+
 const loadScript = (src) => {
   return new Promise((resolve) => {
     const script = document.createElement("script");
@@ -51,7 +53,7 @@ const token = localStorage.getItem("token");
 const fetchParkingLots = async()=>{
 
 const res = await axios.get(
-"http://localhost:5000/parkinglots/all",
+`${SERVER_URL}/parkinglots/all`,
 {
 headers:{
 Authorization:`Bearer ${token}`
@@ -77,7 +79,7 @@ setVehicles(res.vehicles);
 const fetchSlots = async(lotId)=>{
 
 const res = await axios.get(
-`http://localhost:5000/slots/lot/${lotId}`,
+`${SERVER_URL}/slots/lot/${lotId}`,
 {
 headers:{
 Authorization:`Bearer ${token}`

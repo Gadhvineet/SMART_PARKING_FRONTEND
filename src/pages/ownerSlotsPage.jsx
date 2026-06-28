@@ -15,7 +15,7 @@ function OwnerSlotsPage() {
 
   const [layoutView, setLayoutView] = useState(false);
 
-  const SERVER = "http://localhost:5000";
+  const SERVER_URL = import.meta.env.VITE_API_URL;
 
 
   const fetchSlots = async () => {

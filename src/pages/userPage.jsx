@@ -27,7 +27,7 @@ function UserPage() {
 
   const reviewFormRef = useRef(null);
 
-  const SERVER_URL = "http://localhost:5000";
+  const SERVER_URL = import.meta.env.VITE_API_URL;
 
 
   // ===============================
